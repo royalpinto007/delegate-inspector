@@ -31,4 +31,4 @@ Review found and fixed a missing wrapped-SOL closure note, stale results after i
 
 Automated accessibility checks do not replace screen-reader/manual accessibility testing. Browser checks cover Chromium; Firefox, Safari and physical mobile devices were not tested. RPC reads are separate observations, subject to provider availability, not an atomic snapshot or safety proof. Unknown Token-2022 extensions remain explicitly unverified.
 
-Nothing was published to npm, deployed or posted publicly as part of this build.
+Source code is available on [GitHub](https://github.com/royalpinto007/delegate-inspector). Nothing was published to npm or deployed as a hosted service.

@@ -7,6 +7,8 @@ See the permissions recorded on a Solana address’s token accounts.
 [MIT](LICENSE) · [Architecture](docs/architecture.md) · [Reading the report](docs/guide.md) · [Verification](docs/verification.md)
 
 ```sh
+git clone https://github.com/royalpinto007/delegate-inspector.git
+cd delegate-inspector
 npm install
 npm run demo
 ```

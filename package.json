@@ -60,5 +60,13 @@
   ],
   "overrides": {
     "minimatch": "11.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/royalpinto007/delegate-inspector.git"
+  },
+  "homepage": "https://github.com/royalpinto007/delegate-inspector#readme",
+  "bugs": {
+    "url": "https://github.com/royalpinto007/delegate-inspector/issues"
   }
 }
