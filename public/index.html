@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Read Solana token-account delegates and authorities. A local, read-only inspector with no wallet connection."
+    />
+    <meta name="color-scheme" content="dark" />
+    <title>delegate? · Solana permission inspector</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2399e7cb'/%3E%3Ctext x='13' y='46' font-size='44' font-family='monospace' fill='%230d1714'%3Ed%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">d<span>?</span></span
+        ><span>delegate<span class="accent">?</span></span>
+      </div>
+      <nav aria-label="Main navigation">
+        <button
+          class="nav-button active"
+          id="nav-inspect"
+          type="button"
+          aria-current="page"
+        >
+          Inspection</button
+        ><button class="nav-button" id="nav-help" type="button">Help</button
+        ><button class="nav-button" id="nav-architecture" type="button">
+          Architecture
+        </button>
+      </nav>
+      <span class="readonly"
+        ><span aria-hidden="true">◉</span> Read-only
+        <span class="version">v0.1.0</span></span
+      >
+    </header>
+    <main id="main">
+      <section id="inspect-view" aria-labelledby="page-title">
+        <div class="page-heading">
+          <p class="eyebrow">SOLANA / TOKEN ACCOUNT PERMISSIONS</p>
+          <h1 id="page-title">See who holds permission.</h1>
+          <p class="intro">
+            A clear view of delegates, allowances and account authorities. Just
+            a public address.
+          </p>
+        </div>
+        <div class="workspace">
+          <aside class="sidebar" aria-label="Inspection controls">
+            <section class="panel lookup-panel">
+              <div class="panel-top">
+                <h2>Inspect an address</h2>
+                <span class="tiny-label">01 / INPUT</span>
+              </div>
+              <form id="lookup-form" novalidate>
+                <label for="wallet">Public wallet address</label>
+                <textarea
+                  id="wallet"
+                  name="wallet"
+                  rows="2"
+                  maxlength="64"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  placeholder="Paste a public Solana address…"
+                  aria-describedby="wallet-hint"
+                ></textarea>
+                <p class="field-hint" id="wallet-hint">
+                  Public addresses only. Never enter a private key or seed
+                  phrase.
+                </p>
+                <label for="network">Network</label>
+                <div class="select-wrap">
+                  <select id="network" name="network">
+                    <option value="mainnet">Mainnet</option>
+                    <option value="devnet">Devnet</option>
+                  </select>
+                </div>
+                <button class="primary" id="inspect-button" type="submit">
+                  Inspect address <span aria-hidden="true">↗</span>
+                </button>
+              </form>
+              <p class="privacy-note">
+                Live reads contact public Solana RPC. No wallet connection or
+                transactions.
+              </p>
+            </section>
+            <section class="panel example-panel">
+              <div class="panel-top">
+                <h2>Take a look first</h2>
+                <span class="tiny-label">OFFLINE</span>
+              </div>
+              <p>
+                Explore fictional permissions without making a network request.
+              </p>
+              <label for="example-select">Offline example</label>
+              <div class="select-wrap">
+                <select id="example-select">
+                  <option value="review">Permission review</option>
+                  <option value="plain">No recorded delegates</option>
+                  <option value="partial">Incomplete read</option>
+                  <option value="empty">Empty snapshot</option>
+                </select>
+              </div>
+              <button class="secondary full" id="load-example" type="button">
+                Load example <span aria-hidden="true">→</span>
+              </button>
+            </section>
+            <div class="scope-note">
+              <span class="note-mark" aria-hidden="true">i</span>
+              <p>
+                Permissions are facts to review, not a safety score. A delegate
+                is not automatically malicious.
+              </p>
+            </div>
+          </aside>
+          <div class="results-column">
+            <div id="error" class="error-panel" role="alert" hidden>
+              <h2>Couldn’t complete the inspection</h2>
+              <p id="error-message"></p>
+              <button id="retry" class="secondary" type="button">
+                Retry lookup
+              </button>
+            </div>
+            <div
+              id="loading"
+              class="panel loading-panel"
+              aria-live="polite"
+              hidden
+            >
+              <p class="eyebrow">READING CHAIN STATE</p>
+              <h2>Inspecting the token accounts…</h2>
+              <p>
+                Reading both token programs and their mint-level authorities.
+              </p>
+              <div class="skeleton"></div>
+              <div class="skeleton short"></div>
+              <div class="skeleton"></div>
+            </div>
+            <section id="empty-start" class="panel initial-state">
+              <div class="diagram-mark" aria-hidden="true">
+                <span>OWNER</span><i></i>
+                <div><span>ACCOUNT</span><span>DELEGATE</span></div>
+              </div>
+              <p class="eyebrow">FOLLOW THE AUTHORITY</p>
+              <h2>One address. A clearer picture.</h2>
+              <p>
+                See ordinary delegates and their remaining allowances,
+                mint-level permanent delegates, close authority and frozen
+                accounts.
+              </p>
+              <button class="secondary" type="button" id="try-example">
+                Try permission review <span aria-hidden="true">→</span>
+              </button>
+              <div class="initial-bottom">
+                <span>No signing</span><span>No saved history</span
+                ><span>Open source</span>
+              </div>
+            </section>
+            <section id="report" aria-label="Inspection report" hidden>
+              <div class="report-top">
+                <div>
+                  <div class="report-labels">
+                    <span
+                      id="source-label"
+                      class="badge"
+                      data-testid="source-label"
+                    ></span
+                    ><span
+                      id="coverage-label"
+                      class="badge"
+                      data-testid="coverage-label"
+                    ></span>
+                  </div>
+                  <h2 id="report-title">Permission snapshot</h2>
+                  <p id="report-context" class="report-context"></p>
+                </div>
+                <div class="exports">
+                  <button
+                    id="copy-report"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Copy report"
+                    title="Copy Markdown report"
+                  >
+                    ⧉</button
+                  ><button id="export-json" class="secondary" type="button">
+                    Export JSON</button
+                  ><button id="export-markdown" class="secondary" type="button">
+                    Export Markdown
+                  </button>
+                </div>
+              </div>
+              <p id="source-note" class="source-note"></p>
+              <div class="metrics">
+                <div>
+                  <span>Token accounts</span
+                  ><strong data-testid="account-count" id="account-count"
+                    >0</strong
+                  >
+                </div>
+                <div>
+                  <span>Ordinary delegate accounts</span
+                  ><strong id="delegate-count">0</strong>
+                </div>
+                <div>
+                  <span>Permanent delegate accounts</span
+                  ><strong data-testid="permanent-count" id="permanent-count"
+                    >0</strong
+                  >
+                </div>
+                <div>
+                  <span>Frozen accounts</span
+                  ><strong id="frozen-count">0</strong>
+                </div>
+              </div>
+              <div id="partial-note" class="partial-note" hidden>
+                <strong>Some permissions remain unverified.</strong>
+                <p>
+                  Read the incomplete observations and account notes before
+                  drawing conclusions.
+                </p>
+              </div>
+              <details id="issues" class="issues" hidden>
+                <summary>Incomplete observations</summary>
+                <ul id="issue-list"></ul>
+              </details>
+              <div class="filter-bar">
+                <label class="search-label" for="search"
+                  ><span class="sr-only">Search accounts and authorities</span
+                  ><input
+                    type="search"
+                    id="search"
+                    placeholder="Find an account, mint or authority…"
+                    autocomplete="off"
+                /></label>
+                <div class="select-wrap">
+                  <label class="sr-only" for="permission-filter"
+                    >Permission filter</label
+                  ><select id="permission-filter">
+                    <option value="all">All accounts</option>
+                    <option value="delegated">Ordinary delegates</option>
+                    <option value="permanent">Permanent delegates</option>
+                    <option value="frozen">Frozen accounts</option>
+                    <option value="external-close">
+                      External close authority
+                    </option>
+                    <option value="unverified">Unverified reads</option>
+                  </select>
+                </div>
+              </div>
+              <div class="list-caption">
+                <h3>Token accounts</h3>
+                <span id="results-count"></span>
+              </div>
+              <div id="accounts"></div>
+              <div id="no-results" class="panel no-results" hidden>
+                <h3 id="no-results-title">No token accounts returned</h3>
+                <p id="no-results-text"></p>
+              </div>
+              <div id="pagination" class="pagination" hidden>
+                <button id="previous" type="button" class="secondary">
+                  Previous</button
+                ><span id="page-count"></span
+                ><button id="next" type="button" class="secondary">Next</button>
+              </div>
+              <details class="scope-details">
+                <summary>Read scope and observation slots</summary>
+                <div id="read-scope"></div>
+              </details>
+              <p class="verdict-note">This is not a wallet safety verdict.</p>
+            </section>
+            <div
+              id="status"
+              class="status-message"
+              role="status"
+              aria-live="polite"
+            ></div>
+          </div>
+        </div>
+      </section>
+      <section
+        id="help-view"
+        class="help-view"
+        hidden
+        aria-labelledby="help-title"
+      >
+        <p class="eyebrow">A SHORT FIELD GUIDE</p>
+        <h1 id="help-title">Read the permissions</h1>
+        <p class="intro">
+          An authority address tells you who holds a role. It does not tell you
+          whether that address is trustworthy.
+        </p>
+        <div class="help-grid">
+          <article class="panel">
+            <h2>Ordinary delegate</h2>
+            <p>
+              A token-account owner can give another address permission to
+              transfer or burn up to a recorded allowance. Only one ordinary
+              delegate is stored per account.
+            </p>
+            <p>
+              A zero allowance means no remaining ordinary allowance, even if a
+              delegate address is still recorded.
+            </p>
+          </article>
+          <article class="panel">
+            <h2>Permanent delegate</h2>
+            <p>
+              Token-2022 can assign a delegate to the mint itself. It applies
+              across token accounts for that mint, even if their ordinary
+              delegate fields are empty.
+            </p>
+            <p>
+              Token-account owners cannot revoke this mint-level permission from
+              their own accounts.
+            </p>
+          </article>
+          <article class="panel">
+            <h2>Close authority</h2>
+            <p>
+              This address can authorize closing the token account when the
+              token program’s conditions allow it. If no separate close
+              authority is set, the owner holds that role.
+            </p>
+            <p>
+              For wrapped SOL, closing can withdraw the underlying SOL even when
+              the token balance is nonzero.
+            </p>
+          </article>
+          <article class="panel">
+            <h2>Frozen and unverified</h2>
+            <p>
+              A frozen account blocks ordinary transfers and burns until it is
+              thawed. Its recorded authorities still matter.
+            </p>
+            <p>
+              “Unverified” means a read failed or an extension is outside this
+              tool’s decoding scope. It never means “none.”
+            </p>
+          </article>
+        </div>
+        <article class="panel walkthrough">
+          <h2>How to use it</h2>
+          <ol>
+            <li>Try an offline example first.</li>
+            <li>Paste a public address and choose Mainnet or Devnet.</li>
+            <li>
+              Inspect each account’s ordinary and mint-level authority fields.
+            </li>
+            <li>Read partial observations and extension notes.</li>
+            <li>Export JSON or Markdown to keep a copy.</li>
+          </ol>
+          <p>
+            Amounts use integer raw units and base mint decimals. Scaled or
+            interest-bearing display adjustments are not calculated. No account
+            data or lookup history is saved by the app.
+          </p>
+        </article>
+        <article class="panel architecture-panel" id="architecture-section">
+          <h2>Small by design</h2>
+          <img
+            src="/architecture.svg"
+            width="1040"
+            height="460"
+            alt="delegate? architecture: local dashboard and CLI, read-only scanner, public RPC and report exports"
+          />
+          <p>
+            The server binds to 127.0.0.1. Live reads use public RPC; examples
+            stay offline. There is no wallet connection, transaction submission,
+            database or cloud backend.
+          </p>
+        </article>
+        <div class="guide-links">
+          <span>Official references:</span
+          ><a
+            href="https://solana.com/docs/tokens/basics/approve-delegate"
+            rel="noreferrer"
+            target="_blank"
+            >Delegates ↗</a
+          ><a
+            href="https://solana.com/docs/tokens/extensions/permanent-delegate"
+            rel="noreferrer"
+            target="_blank"
+            >Permanent delegates ↗</a
+          ><a
+            href="https://solana.com/docs/tokens/basics/set-authority"
+            rel="noreferrer"
+            target="_blank"
+            >Authorities ↗</a
+          >
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span
+        >delegate? <span class="footer-divider">/</span> Read the permission.
+        Keep the context.</span
+      ><span>Local-first · MIT licensed</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "name": "delegate-inspector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Read-only, local-first Solana token-account permission inspector.",
+  "author": "Royal Pinto <royalpinto007@gmail.com>",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "bin": {
+    "delegate-inspector": "dist/cli.js"
+  },
+  "scripts": {
+    "demo": "npm run build && node --env-file-if-exists=.env dist/cli.js",
+    "start": "node --env-file-if-exists=.env dist/cli.js",
+    "cli": "node --env-file-if-exists=.env dist/cli.js",
+    "dev": "npm run build && tsx watch src/cli.ts",
+    "build": "tsc -p tsconfig.build.json && node scripts/build.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
+    "prepack": "npm run build",
+    "package:check": "node scripts/check-package.mjs"
+  },
+  "dependencies": {
+    "bs58": "6.0.0",
+    "express": "5.3.0",
+    "helmet": "8.3.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/express": "5.0.6",
+    "@types/node": "22.20.5",
+    "@types/supertest": "7.2.1",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "prettier": "3.9.10",
+    "supertest": "7.3.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  },
+  "files": [
+    "dist/",
+    "docs/",
+    "LICENSE",
+    "README.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
+  "overrides": {
+    "minimatch": "11.0.1"
+  }
+}

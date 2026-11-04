@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.tgz
+playwright-report/
+test-results/
+coverage/
+.DS_Store
