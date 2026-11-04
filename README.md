@@ -1,5 +1,7 @@
 # delegate?
 
+[![CI](https://github.com/royalpinto007/delegate-inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/royalpinto007/delegate-inspector/actions/workflows/ci.yml)
+
 See the permissions recorded on a Solana address’s token accounts.
 
 ![delegate? dashboard](docs/screenshot.png)
